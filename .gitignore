@@ -10,3 +10,7 @@ __pycache__/
 
 # Журнали
 *.log
+
+# Збирання exe
+build/
+dist/

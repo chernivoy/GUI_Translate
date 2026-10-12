@@ -27,6 +27,15 @@ python -m venv .venv
 
 Програма працює з області сповіщень (трею). Там же — налаштування гарячої клавіші, мова OCR і винятки.
 
+## Збирання exe
+
+```powershell
+.venv\Scripts\pip install pyinstaller
+.venv\Scripts\python build.py
+```
+
+Результат — один файл `dist\TranslateGUI.exe`, якому не потрібен встановлений Python.
+
 ## Де що зберігається
 
 - Налаштування: реєстр, `HKCU\Software\TranslateGUI\TranslateGUI`
