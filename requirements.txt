@@ -1,0 +1,14 @@
+﻿PySide6-Essentials>=6.7
+pynput>=1.7.7
+uiautomation>=2.0.20
+deep-translator>=1.11
+requests>=2.31
+mss>=10.2
+Pillow>=10
+winrt-runtime>=3.0
+winrt-Windows.Foundation>=3.0
+winrt-Windows.Foundation.Collections>=3.0
+winrt-Windows.Globalization>=3.0
+winrt-Windows.Graphics.Imaging>=3.0
+winrt-Windows.Media.Ocr>=3.0
+winrt-Windows.Storage.Streams>=3.0
