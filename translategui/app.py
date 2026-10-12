@@ -19,6 +19,7 @@ from .popup import PopupWindow
 from .processes import cursor_pos, foreground_pid, process_name
 from .theme import THEMES, app_icon, apply_app_color_scheme, system_theme
 from .translator import Translator, language_choices
+from .tray_visibility import promote_tray_icon
 
 log = logging.getLogger(__name__)
 
@@ -26,6 +27,7 @@ DEFAULT_TARGET_LANGUAGE = "uk"
 DEFAULT_OCR_LANGUAGE = "auto"  # ocr.AUTO; сам модуль ocr (winrt) імпортуємо лише після створення Qt
 ERROR_ALREADY_EXISTS = 183
 SM_REMOTESESSION = 0x1000
+TRAY_PROMOTE_ATTEMPTS = 10
 
 
 class _Bridge(QObject):
@@ -94,6 +96,10 @@ class Controller(QObject):
         self._mouse.start()
         self._keyboard.start()
         self._tray.show()
+        # Лише для exe (під Python запис належав би інтерпретатору python.exe) і лише раз для кожного
+        # його розташування: якщо потім користувач сховає значок, це його вибір.
+        if getattr(sys, "frozen", False) and self._settings.value("tray_promoted_for", "") != sys.executable:
+            self._promote_tray_icon(TRAY_PROMOTE_ATTEMPTS)
         self._tray.showMessage(
             "Translate GUI працює",
             f"Натисніть {self._hotkey_title()} — перекладу виділений текст, а якщо нічого не виділено, "
@@ -101,6 +107,18 @@ class Controller(QObject):
             QSystemTrayIcon.Information,
             4000,
         )
+
+    def _promote_tray_icon(self, attempts):
+        """Explorer заводить запис про значок не одразу після показу — пробуємо кілька разів."""
+        try:
+            found = promote_tray_icon(sys.executable)
+        except OSError:
+            log.exception("Не вдалося винести значок у треї на панель завдань")
+            return
+        if found:
+            self._settings.setValue("tray_promoted_for", sys.executable)
+        elif attempts > 1:
+            QTimer.singleShot(1000, lambda: self._promote_tray_icon(attempts - 1))
 
     def _watch_displays(self, app):
         """Під RDP монітори й масштаб змінюються при перепідключенні з іншого пристрою."""
